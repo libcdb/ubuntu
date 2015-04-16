@@ -80,6 +80,7 @@ function download() {
          --reject "*-xen*" \
          --reject "*-source*" \
          --reject "*-pic*" \
+         --reject "*linux-libc-dev*"
          --verbose \
          -P $1 \
          $URL
@@ -132,11 +133,13 @@ do
     git commit -m "$deb"
 
     mark $deb $(git rev-parse HEAD)
+    git add $deb
+    git commit -m "update .debs"
 done
 }
 
 [[ -d debfiles ]] || mkdir debfiles
 
 check    debfiles
-download debfiles
-extract  debfiles
+# download debfiles
+# extract  debfiles
