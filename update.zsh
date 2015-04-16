@@ -1,11 +1,23 @@
 #!/usr/bin/env zsh
 
 function is_marked {
+    # If it's a deb-file, don't try to read it
     if file "$1" | grep Debian > /dev/null;
     then
-        return 1
+        false
+        return
     fi
-    return 0
+
+    # Ensure the commit actually exists
+    commit="$(head -c40 $1)"
+    if [ "$(git cat-file -t $commit 2>/dev/null)" = "commit" ];
+    then
+        true
+        return
+    fi
+
+    false
+    return
 }
 
 function mark {
@@ -67,9 +79,10 @@ function download() {
          --reject "*-udeb*" \
          --reject "*-xen*" \
          --reject "*-source*" \
+         --reject "*-pic*" \
          --verbose \
          -P $1 \
-         $URL &
+         $URL
     done
 
     for URL in $URLS;
@@ -124,6 +137,6 @@ done
 
 [[ -d debfiles ]] || mkdir debfiles
 
-# check    debfiles
+check    debfiles
 download debfiles
 extract  debfiles
